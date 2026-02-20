@@ -53,10 +53,16 @@ exports.loginUser = async (req, res) => {
       { expiresIn: "1d" }
     );
 
-    res.status(200).json({
-      message: "Login successful",
-      token,
+    // ✅ SET COOKIE HERE
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: false, // true in production (https)
+      sameSite: "lax",
     });
+
+    // ✅ SEND RESPONSE
+    res.status(200).json({ message: "Login successful" });
+
   } catch (error) {
     res.status(500).json({ message: "Server error" });
   }
