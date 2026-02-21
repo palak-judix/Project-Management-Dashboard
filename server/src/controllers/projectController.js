@@ -1,7 +1,6 @@
 const Project = require("../models/Project")
 const Task = require("../models/Task")
 
-/* CREATE PROJECT */
 exports.createProject = async (req, res) => {
   try {
     const project = await Project.create({
@@ -15,7 +14,6 @@ exports.createProject = async (req, res) => {
   }
 }
 
-/* GET ALL PROJECTS */
 exports.getProjects = async (req, res) => {
   try {
     const projects = await Project.find({ user: req.user.id })
@@ -25,7 +23,6 @@ exports.getProjects = async (req, res) => {
   }
 }
 
-/* ADD TASK */
 exports.addTask = async (req, res) => {
   try {
     const task = await Task.create({
@@ -38,8 +35,18 @@ exports.addTask = async (req, res) => {
     res.status(500).json({ message: error.message })
   }
 }
+exports.getTasks = async (req, res) => {
+  try {
+    const tasks = await Task.find({
+      project: req.params.projectId,
+    });
 
-/* DELETE TASK */
+    res.json(tasks);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 exports.deleteTask = async (req, res) => {
   try {
     await Task.findByIdAndDelete(req.params.taskId)
@@ -48,8 +55,17 @@ exports.deleteTask = async (req, res) => {
     res.status(500).json({ message: error.message })
   }
 }
+exports.deleteProject = async (req, res) => {
+  try {
+    await Project.findByIdAndDelete(req.params.projectId);
+    await Task.deleteMany({ project: req.params.projectId });
 
-/* MARK TASK AS DONE */
+    res.json({ message: "Project deleted" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 exports.markTaskDone = async (req, res) => {
   try {
     const task = await Task.findById(req.params.taskId)
